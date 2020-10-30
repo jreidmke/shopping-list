@@ -10,20 +10,16 @@ app.use(express.urlencoded({ extended: true })); //form data
 const ExpressError = require("./expressError");
 
 //Here is a good place to get routes
-const userRoutes = require('./routes/books');
-app.use("/users", userRoutes);
-const msgRoutes = require('./routes/msgs');
-app.use("/msgs", msgRoutes);
+const listRoutes = require('./routes/list');
+app.use("/list", listRoutes);
 
 /** 404 handler */
-
 app.use(function (req, res, next) {
   const err = new ExpressError("Not Found", 404);
   return next(err);
 });
 
 /** general error handler */
-
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
 
