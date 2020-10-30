@@ -1,18 +1,43 @@
 const express = require("express");//to access Router method, import express first
 const router = express.Router();//store router Method in variable router
 const db = require('../db');//import db as well will be making queries to our database.
+const ExpressError = require("../expressError");
 
 router.get('/', async(req, res, next) => {
-    //returns a list of all items on shopping list
+    const resp = await db.query(`
+    SELECT * FROM list;
+    `)
+    return res.json(resp.rows);
 })
 
 router.get('/:name', async(req, res, next) => {
-    //returns single item
+    const name = req.params.name
+    try {
+        const resp = await db.query(`
+        SELECT *
+        FROM list
+        WHERE name=$1
+        `, [name]);
+
+        if(resp.rows.length === 0) {
+            throw new ExpressError("Invalid Name", 404)
+        }
+
+        return res.json(resp.rows[0]);
+    } catch (error) {
+        return next(error);
+    }
 })
 
 router.post('/', async(req, res, next) => {
     //adds item to list in json body
-
+    const { name, price } = req.body;
+    const resp = await db.query(`
+    INSERT INTO list
+    VALUES($1, $2)
+    RETURNING name, price
+    `, [name, price]);
+    return res.status(201).json({added: resp.rows[0]});
     //returns {“added”: {“name”: “popsicle”, “price”: 1.45}}
 })
 
