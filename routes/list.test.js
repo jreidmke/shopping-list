@@ -56,47 +56,40 @@ describe("POST /list", () => {
         const getItemResp = await request(app).get(`/list/${newItem.name}`);
         expect(getItemResp.body).toEqual(newItem);
     })
+})
 
-    // test("Returns error with improper json body passed in", async () => {
-    //     const badItem = {what: 56, no: "wha"};
-    //     const resp = await request(app).post(`list`).send(badItem);
+//three for patch (success, 404)
+describe("PATCH /list/:name", () => {
+    test("patches a new item and updates it's data", async () => {
+        const newItem = {name: "candy", price: .50};
+        const resp = await request(app).patch(`/list/${item.name}`).send(newItem);
+        expect(resp.statusCode).toBe(200);
+        expect(resp.body).toEqual({updated: newItem});
+
+        const getItemResp = await request(app).get(`/list/`);
+        expect(getItemResp.body[0]).toEqual(newItem);
+    })
+
+    test("returns 404 with bad name passed in", async () => {
+        const resp = await request(app).patch(`/list/blah`).send("unneeded");
+        expect(resp.statusCode).toBe(404);
+    })
+})
+
+// //two for delete (success and 404)
+
+describe("DELETE /list/:name", () => {
+    test("deletes item by name", async () => {
+        const resp = await request(app).delete(`/list/${item.name}`);
+        expect(resp.statusCode).toBe(202);
+        expect(resp.body).toEqual({message: "Deleted"});
+    })
+
+    // test("return 404 with bad name passed in", async () => {
+    //     const resp = await request(app).delete(`list/blah`);
     //     expect(resp.statusCode).toBe(404);
     // })
 })
-
-
-// //three for patch (success, 404, and wrong json body)
-// describe("PATCH /list/:name", () => {
-//     test("patches a new item and updates it's data", async () => {
-//         const newItem = {name: "candy", price: .50};
-//         const resp = await request(app).patch(`/list/${item.name}`).send(newItem);
-//         expect(resp.statusCode).toBe(200);
-//         expect(resp.body).toEqual({updated: newItem});
-
-//         const getItemResp = await request(app).get(`/list/`);
-//         expect(resp.body[0]).toEqual(newItem);
-//         expect(resp.body).toHaveLength(1);
-//     })
-
-//     test("returns 404 with bad name passed in", async () => {
-//         const resp = await request(app).patch(`/list/blah`).send("unneeded");
-//         expect(resp.statusCode).toBe(404);
-//     })
-// })
-// //two for delete (success and 404)
-
-// describe("DELETE /list/:name", () => {
-//     test("deletes item by name", async () => {
-//         const resp = await request(app).delete(`/list/${item.name}`);
-//         expect(resp.statusCode).toBe(202);
-//         expect(resp.body).toEqual({message: "Deleted"});
-//     })
-
-//     test("return 404 with bad name passed in", async () => {
-//         const resp = await request(app).delete(`list/blah`);
-//         expect(resp.statusCode).toBe(404);
-//     })
-// })
 
 // // //This testing pattern is the best because it doesn't just test the database OR the api
 
